@@ -91,7 +91,6 @@ class mainScene extends Phaser.Scene {
     if (this.keys.SPACE.isDown && time > this.playerLastFired) {
       const bullet = this.bullets.get(); //弾をプールから取得
       bullet.getPlayer(this.player2); //相手キャラクターをクラスへおくる
-
       if (bullet) {
         //プールの中に利用可能な弾があれば使う
         bullet.fire(this.player.x, this.player.y);
