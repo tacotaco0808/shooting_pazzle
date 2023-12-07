@@ -20,12 +20,6 @@ class EnemyBullet extends Phaser.Physics.Arcade.Image {
 
   update(time, delta) {
     this.y += this.speed * delta;
-    // プレイヤーとの衝突を検知
-    const colliedPlayer = this.player; // プレイヤーオブジェクトへの参照を取得
-    if (colliedPlayer && Phaser.Geom.Intersects.RectangleToRectangle(this.getBounds(), colliedPlayer.getBounds())) {
-      // プレイヤーとの衝突が発生した場合の処理
-      this.destroy();
-    }
   }
 }
 export default EnemyBullet;

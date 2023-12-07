@@ -18,7 +18,8 @@ class mainScene extends Phaser.Scene {
   keys;
   /**@type {Phaser.Physics.Arcade.Group} */
   pazzles;
-  /**@type {Phaser.Physics.Arcade.Image} */
+  pazzleNum = 9; //number of pazzle
+  /**@type {Phaser.Physics.Arcade.Group} */
   bullets;
   /**@type {Phaser.Physics.Arcade.Image} */
   enemyBullets;
@@ -41,9 +42,9 @@ class mainScene extends Phaser.Scene {
     this.player2 = this.physics.add.sprite(360, 0, 'player2').setScale(0.5);
     //pazzle
     this.pazzles = this.physics.add.group({ classType: Pazzle });
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < this.pazzleNum; i++) {
       const x = Phaser.Math.Between(0, 720); //x:0~400の間にrandomで生成
-      const y = 100 * i; //高さもランダム
+      const y = 55 * i; //高さもランダム
       /** @type {Phaser.Physics.Arcade.Sprite} */
       const pazzle = this.pazzles.create(x, y, 'pazzle');
       pazzle.scale = 0.8;
@@ -89,14 +90,21 @@ class mainScene extends Phaser.Scene {
 
     //bullet
     if (this.keys.SPACE.isDown && time > this.playerLastFired) {
-      const bullet = this.bullets.get(); //弾をプールから取得
-      bullet.getPlayer(this.player2); //相手キャラクターをクラスへおくる
+      const bullet = this.bullets.get(); //弾を1つプールから取得
 
       if (bullet) {
-        //プールの中に利用可能な弾があれば使う
-        bullet.fire(this.player.x, this.player.y);
-        this.playerLastFired = time + 1000; //一つ目の弾発射時+Xms秒後に２つ目発射
+        //プールにbulletが存在するか
+        //setActiveについての学習から
+        console.log(this.bullets.getTotalUsed());
+        console.log(this.bullets.getTotalFree());
+        this.playerLastFired = time + 1000;
       }
+
+      // if (bullet) {
+      //   //プールの中に利用可能な弾があれば使う
+      //   bullet.fire(this.player.x, this.player.y);
+      //   this.playerLastFired = time + 1000; //一つ目の弾発射時+Xms秒後に２つ目発射
+      // }
     }
     if (this.keys.W.isDown) {
       this.player2.setVelocityY(-200);
