@@ -1,5 +1,4 @@
 class EnemyBullet extends Phaser.Physics.Arcade.Image {
-  checkCollision = false;
   speed;
   /**@type {Phaser.Physics.Arcade.Sprite} */
   player;
@@ -13,9 +12,6 @@ class EnemyBullet extends Phaser.Physics.Arcade.Image {
     this.setActive(true);
     this.setVisible(true);
     this.setPosition(x, y);
-  }
-  getPlayer(sprite) {
-    this.player = sprite;
   }
 
   update(time, delta) {

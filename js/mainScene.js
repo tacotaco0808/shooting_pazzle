@@ -7,10 +7,13 @@ class mainScene extends Phaser.Scene {
   player;
   playerStun = false;
   playerHoldPazzle = 0;
+  /**@type {Phaser.GameObjects.Text} */
   playerHoldPazzleText;
   playerLastFired = 0;
+
   /**@type {Phaser.Physics.Arcade.Sprite}*/ //TSの型宣言みたいなやつ
   player2;
+  player2Stun = false;
   enemyLastFired = 0;
   /**@type {Phaser.Types.Input.Keyboard.CursorKeys} */
   cursors;
@@ -21,7 +24,8 @@ class mainScene extends Phaser.Scene {
   pazzleNum = 9; //number of pazzle
   /**@type {Phaser.Physics.Arcade.Group} */
   bullets;
-  /**@type {Phaser.Physics.Arcade.Image} */
+  maxBullets = 3;
+  /**@type {Phaser.Physics.Arcade.Group} */
   enemyBullets;
   constructor() {
     super('mainGame');
@@ -30,6 +34,7 @@ class mainScene extends Phaser.Scene {
     this.load.image('background', 'assets/Background/bg_layer1.png');
     this.load.image('player', 'assets/Enemies/flyMan_fly.png');
     this.load.image('player2', 'assets/Enemies/wingMan1.png');
+    this.load.image('player2Stun', 'assets/Enemies/spikeMan_jump.png');
     this.load.image('pazzle', 'assets/Items/carrot.png');
     this.load.image('bullet', 'assets/Enemies/spikeBall1.png');
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -54,14 +59,15 @@ class mainScene extends Phaser.Scene {
     }
     //bullet
     //add.groupで弾のプール作成
-    this.bullets = this.physics.add.group({ classType: Bullet, maxSize: 5, runChildUpdate: true }); //runChildupdateはグループが更新される際、子要素のupdateも呼び出される
-    this.enemyBullets = this.physics.add.group({ classType: EnemyBullet, maxSize: 5, runChildUpdate: true });
+    this.bullets = this.physics.add.group({ classType: Bullet, maxSize: this.maxBullets, runChildUpdate: true }); //runChildupdateはグループが更新される際、子要素のupdateも呼び出される
+    this.enemyBullets = this.physics.add.group({ classType: EnemyBullet, maxSize: this.maxBullets, runChildUpdate: true });
     //collision evt
     this.physics.add.overlap(this.player, this.pazzles, this.handleCollisionPazzle, undefined, this);
-
+    this.physics.add.overlap(this.player2, this.bullets, this.handleCollisionBullet, undefined, this);
+    this.physics.add.overlap(this.player, this.enemyBullets, this.handleCollisionEnemyBullet, undefined, this);
     //countText
     const countText = { color: 'white', fontSize: 24 };
-    this.playerHoldPazzleText = this.add.text(80, 0, 'Player: 0', countText).setScrollFactor(0).setOrigin(0.5, 0);
+    this.playerHoldPazzleText = this.add.text(80, 0, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(0.5, 0);
   }
   update(time, delta) {
     if (this.playerStun !== true) {
@@ -87,63 +93,95 @@ class mainScene extends Phaser.Scene {
     } else {
       //スタン状態(動けない)
     }
-
+    //player2
+    if (this.player2Stun !== true) {
+      if (this.keys.W.isDown) {
+        this.player2.setVelocityY(-200);
+      } else if (this.keys.S.isDown) {
+        this.player2.setVelocityY(200);
+      } else {
+        this.player2.setVelocityY(0);
+      }
+      if (this.keys.A.isDown) {
+        this.player2.setVelocityX(-200);
+      } else if (this.keys.D.isDown) {
+        this.player2.setVelocityX(200);
+      } else {
+        this.player2.setVelocityX(0);
+      }
+    }
     //bullet
     if (this.keys.SPACE.isDown && time > this.playerLastFired) {
+      /**@type {Bullet} */
       const bullet = this.bullets.get(); //弾を1つプールから取得
-
+      this.bullets.children.iterate((bulletsChild) => {
+        this.bullets.world.add(bulletsChild.body); //this.bullets.children.iterate((bullet) =>と同じ
+      });
       if (bullet) {
-        //プールにbulletが存在するか
-        //setActiveについての学習から
-        console.log(this.bullets.getTotalUsed());
-        console.log(this.bullets.getTotalFree());
-        this.playerLastFired = time + 1000;
+        //プールの中に利用可能な弾があれば使う
+        bullet.fire(this.player.x, this.player.y);
+        this.playerLastFired = time + 100; //一つ目の弾発射時+Xms秒後に２つ目発射
       }
-
-      // if (bullet) {
-      //   //プールの中に利用可能な弾があれば使う
-      //   bullet.fire(this.player.x, this.player.y);
-      //   this.playerLastFired = time + 1000; //一つ目の弾発射時+Xms秒後に２つ目発射
-      // }
     }
-    if (this.keys.W.isDown) {
-      this.player2.setVelocityY(-200);
-    } else if (this.keys.S.isDown) {
-      this.player2.setVelocityY(200);
-    } else {
-      this.player2.setVelocityY(0);
-    }
-    if (this.keys.A.isDown) {
-      this.player2.setVelocityX(-200);
-    } else if (this.keys.D.isDown) {
-      this.player2.setVelocityX(200);
-    } else {
-      this.player2.setVelocityX(0);
-    }
+    this.bullets.children.iterate((bullet) => {
+      // colliedPlayer && Phaser.Geom.Intersects.RectangleToRectangle(this.getBounds(), colliedPlayer.getBounds())
+      if (bullet.y < 0 || bullet.y > this.sys.canvas.height + 50 || (this.player2 && Phaser.Geom.Intersects.RectangleToRectangle(bullet.getBounds(), this.player2.getBounds()))) {
+        this.bullets.world.remove(bullet.body);
+        this.bullets.killAndHide(bullet); //bulletを非表示にしてプールへ戻す　||非アクティブにするだけでプールに戻さない場合はsetActive(false)を使用する
+      }
+    }); //プールから子要素(弾を読み取り)
 
     //enemybullet
     if (this.keys.E.isDown && time > this.enemyLastFired) {
       const bullet = this.enemyBullets.get(); //弾をプールから取得
-      bullet.getPlayer(this.player); //相手キャラクターをクラスへおくる
+      this.enemyBullets.children.iterate((bulletsChild) => {
+        this.enemyBullets.world.add(bulletsChild.body); //this.bullets.children.iterate((bullet) =>と同じ
+      });
       if (bullet) {
         //プールの中に利用可能な弾があれば使う
         bullet.fire(this.player2.x, this.player2.y);
-        this.enemyLastFired = time + 1000; //一つ目の弾発射時+Xms秒後に２つ目発射
+        this.enemyLastFired = time + 100; //一つ目の弾発射時+Xms秒後に２つ目発射
       }
     }
+    this.enemyBullets.children.iterate((bullet) => {
+      // colliedPlayer && Phaser.Geom.Intersects.RectangleToRectangle(this.getBounds(), colliedPlayer.getBounds())
+      if (bullet.y < 0 || bullet.y > this.sys.canvas.height + 0 || (this.player && Phaser.Geom.Intersects.RectangleToRectangle(bullet.getBounds(), this.player.getBounds()))) {
+        this.enemyBullets.world.remove(bullet.body);
+        this.enemyBullets.killAndHide(bullet); //bulletを非表示にしてプールへ戻す　||非アクティブにするだけでプールに戻さない場合はsetActive(false)を使用する
+      }
+    }); //プールから子要素(弾を読み取り)
   }
 
   handleCollisionPazzle(player, pazzle) {
     //取得イベント
-    if (this.playerHoldPazzle < 4) {
+    if (this.playerHoldPazzle < 3) {
       //持てるピースは4個まで
       this.pazzles.killAndHide(pazzle);
       this.physics.world.disableBody(pazzle.body);
       this.playerHoldPazzle++;
-      const value = `Player: ${this.playerHoldPazzle}`;
+      const value = `Pazzle: ${this.playerHoldPazzle}`;
       this.playerHoldPazzleText.text = value;
       console.log(this.playerHoldPazzle);
+    } else if (this.playerHoldPazzle == 3) {
+      this.pazzles.killAndHide(pazzle);
+      this.physics.world.disableBody(pazzle.body);
+      this.playerHoldPazzle++;
+      const value = `Pazzle: ${this.playerHoldPazzle}`;
+      this.playerHoldPazzleText.text = value;
+      this.playerHoldPazzleText.setStyle({ color: '#FF0000' }); //red
+      console.log(this.playerHoldPazzle);
     }
+  }
+  handleCollisionBullet(player2, bullet) {
+    this.time.delayedCall(2000, this.playerStunFalse, [], this);
+    this.player2Stun = true;
+    this.player2.setTexture('player2Stun');
+    this.player2.setVelocity(0);
+  }
+  handleCollisionEnemyBullet(player, enemyBullet) {}
+  playerStunFalse() {
+    this.player2Stun = false;
+    this.player2.setTexture('player2');
   }
 }
 export default mainScene;
