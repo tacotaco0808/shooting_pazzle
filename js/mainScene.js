@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import Pazzle from './pazzle';
 import Bullet from './Bullet';
 import EnemyBullet from './EnemyBullet';
+import PazzlePlate from './pazzlePlate';
+
 class mainScene extends Phaser.Scene {
   /**@type {Phaser.Physics.Arcade.Sprite}*/ //TSの型宣言みたいなやつ
   player;
@@ -70,6 +72,8 @@ class mainScene extends Phaser.Scene {
     //setOriginはオブジェクトの中心をきめる
     this.playerHoldPazzleText = this.add.text(this.sys.canvas.width, this.sys.canvas.height, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(1, 1);
     this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
+    //pazzlePlate
+    const pazzlePlate = new PazzlePlate(this, 360, 250);
   }
   update(time, delta) {
     if (this.playerStun !== true) {
