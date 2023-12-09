@@ -67,7 +67,9 @@ class mainScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.enemyBullets, this.handleCollisionEnemyBullet, undefined, this);
     //countText
     const countText = { color: 'white', fontSize: 24 };
-    this.playerHoldPazzleText = this.add.text(80, 0, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(0.5, 0);
+    //setOriginはオブジェクトの中心をきめる
+    this.playerHoldPazzleText = this.add.text(this.sys.canvas.width, this.sys.canvas.height, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(1, 1);
+    this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
   }
   update(time, delta) {
     if (this.playerStun !== true) {
