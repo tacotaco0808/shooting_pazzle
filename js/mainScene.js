@@ -29,6 +29,10 @@ class mainScene extends Phaser.Scene {
   maxBullets = 3;
   /**@type {Phaser.Physics.Arcade.Group} */
   enemyBullets;
+  /**@type {PazzlePlate} */
+  pazzlePlate;
+  //
+  pazzleSetter; //パズルを持っていくところ
   constructor() {
     super('mainGame');
   }
@@ -72,8 +76,10 @@ class mainScene extends Phaser.Scene {
     //setOriginはオブジェクトの中心をきめる
     this.playerHoldPazzleText = this.add.text(this.sys.canvas.width, this.sys.canvas.height, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(1, 1);
     this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
+    //pazzleSetter
+
     //pazzlePlate
-    const pazzlePlate = new PazzlePlate(this, 360, 250);
+    this.pazzlePlate = new PazzlePlate(this, 360, 250);
   }
   update(time, delta) {
     if (this.playerStun !== true) {

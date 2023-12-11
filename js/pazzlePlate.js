@@ -17,6 +17,8 @@ class PazzlePlate extends Phaser.GameObjects.Container {
   image8;
   /**@type {Phaser.GameObjects.Image} */
   image9;
+  //setImage
+  imageArray = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   //9x9のパズル
   /**@param {Phaser.Scene} scene  */
@@ -46,6 +48,58 @@ class PazzlePlate extends Phaser.GameObjects.Container {
     this.image9.setVisible(false);
     //パズルのプレートを表示
     scene.add.existing(this);
+    console.log(this.imageArray);
+  }
+  shuffleAndSetImage(count) {
+    if (this.imageArray.length) {
+      //配列の中に値が存在するならcount回抽選
+      for (let i = 0; i < count; i++) {
+        let indexPazzle = 0; //抽選した番号
+        this.shuffleArray(); //抽選
+        indexPazzle = this.imageArray.pop();
+        console.log(i + ':' + indexPazzle);
+        this.setImage(indexPazzle);
+      }
+    }
+  }
+  shuffleArray() {
+    //配列の中身をシャッフル
+    this.imageArray = this.imageArray.slice().sort(() => Math.random() - Math.random());
+  }
+  setImage(numPazzle) {
+    //指定された番号のパズルを表示
+    switch (numPazzle) {
+      case 1:
+        this.image1.setVisible(true);
+        break;
+      case 2:
+        this.image2.setVisible(true);
+        break;
+      case 3:
+        this.image3.setVisible(true);
+        break;
+      case 4:
+        this.image4.setVisible(true);
+        break;
+      case 5:
+        this.image5.setVisible(true);
+        break;
+      case 6:
+        this.image6.setVisible(true);
+        break;
+      case 7:
+        this.image7.setVisible(true);
+        break;
+      case 8:
+        this.image8.setVisible(true);
+        break;
+      case 9:
+        this.image9.setVisible(true);
+        break;
+      default:
+        // デフォルトの処理
+        break;
+    }
   }
 }
 export default PazzlePlate;
