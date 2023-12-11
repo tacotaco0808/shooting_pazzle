@@ -16,7 +16,10 @@ class PazzleSetter extends Phaser.Physics.Arcade.Sprite {
     scene.physics.world.enable(this);
   }
   preUpdate(time, delta) {
+    //preUpdateをインスタンス作成時に動作させる
     super.preUpdate(time, delta);
+
+    //衝突判定
     if (this.scene.physics.overlap(this.player, this) && time > this.lastCollision) {
       console.log('SetPazzle');
       this.lastCollision = time + 5000;
