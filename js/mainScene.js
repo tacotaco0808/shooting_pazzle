@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import Pazzle from './pazzle';
 import Bullet from './Bullet';
 import EnemyBullet from './EnemyBullet';
-import PazzlePlate from './pazzlePlate';
+import PazzleSetter from './PazzleSetter';
 
 class mainScene extends Phaser.Scene {
   /**@type {Phaser.Physics.Arcade.Sprite}*/ //TSの型宣言みたいなやつ
@@ -29,10 +29,8 @@ class mainScene extends Phaser.Scene {
   maxBullets = 3;
   /**@type {Phaser.Physics.Arcade.Group} */
   enemyBullets;
-  /**@type {PazzlePlate} */
-  pazzlePlate;
-  //
-  pazzleSetter; //パズルを持っていくところ
+  /**@type {PazzleSetter} */
+  pazzleSetter; //パズルを持っていくところ(コインのとこ)
   constructor() {
     super('mainGame');
   }
@@ -43,6 +41,7 @@ class mainScene extends Phaser.Scene {
     this.load.image('player2Stun', 'assets/Enemies/spikeMan_jump.png');
     this.load.image('pazzle', 'assets/Items/carrot.png');
     this.load.image('bullet', 'assets/Enemies/spikeBall1.png');
+    this.load.image('pazzleSetter', 'assets/Items/gold_1.png');
     this.cursors = this.input.keyboard.createCursorKeys();
     this.keys = this.input.keyboard.addKeys('W,A,S,D,E,SPACE'); //keyboardPluginであるaddkeysメソッドを使ってthis.input.keyboard.Keyを追加
   }
@@ -67,19 +66,20 @@ class mainScene extends Phaser.Scene {
     //add.groupで弾のプール作成
     this.bullets = this.physics.add.group({ classType: Bullet, maxSize: this.maxBullets, runChildUpdate: true }); //runChildupdateはグループが更新される際、子要素のupdateも呼び出される
     this.enemyBullets = this.physics.add.group({ classType: EnemyBullet, maxSize: this.maxBullets, runChildUpdate: true });
-    //collision evt
-    this.physics.add.overlap(this.player, this.pazzles, this.handleCollisionPazzle, undefined, this);
-    this.physics.add.overlap(this.player2, this.bullets, this.handleCollisionBullet, undefined, this);
-    this.physics.add.overlap(this.player, this.enemyBullets, this.handleCollisionEnemyBullet, undefined, this);
+
     //countText
     const countText = { color: 'white', fontSize: 24 };
     //setOriginはオブジェクトの中心をきめる
     this.playerHoldPazzleText = this.add.text(this.sys.canvas.width, this.sys.canvas.height, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(1, 1);
     this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
     //pazzleSetter
+    this.pazzleSetter = new PazzleSetter(this, 360, 250, 'pazzleSetter', this.player);
 
-    //pazzlePlate
-    this.pazzlePlate = new PazzlePlate(this, 360, 250);
+    //collision evt
+    this.physics.add.overlap(this.player, this.pazzles, this.handleCollisionPazzle, undefined, this);
+    this.physics.add.overlap(this.player2, this.bullets, this.handleCollisionBullet, undefined, this);
+    this.physics.add.overlap(this.player, this.enemyBullets, this.handleCollisionEnemyBullet, undefined, this);
+    this.physics.add.overlap(this.player, this.pazzleSetter, this.handleCollisionPazzleSetter, undefined, this);
   }
   update(time, delta) {
     if (this.playerStun !== true) {
@@ -195,6 +195,12 @@ class mainScene extends Phaser.Scene {
   playerStunFalse() {
     this.player2Stun = false;
     this.player2.setTexture('player2');
+  }
+  handleCollisionPazzleSetter(player, pazzleSetter) {
+    this.pazzleSetter.setHoldPazzleNum(this.playerHoldPazzle);
+    this.playerHoldPazzle = 0; //この処理らをpazzleSetterとの衝突判定で書く
+    const value = `Pazzle: ${this.playerHoldPazzle}`;
+    this.playerHoldPazzleText.text = value;
   }
 }
 export default mainScene;
