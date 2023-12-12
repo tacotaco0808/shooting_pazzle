@@ -4,7 +4,7 @@ class PazzleSetter extends Phaser.Physics.Arcade.Sprite {
   player; //当たったプレイヤーを検知
   lastCollision = 0;
   pazzlePlate; //PazzleSetterの生成される場所にPazzlePlateを配置
-  holdPazzleNum = 2; //プレイヤーが持っているパズルの数
+  holdPazzleNum = 0; //プレイヤーが持っているパズルの数
   /**@param {Phaser.Scene} scene  */
   constructor(scene, x, y, texture, collisionPlayer) {
     //初期化
