@@ -25,15 +25,25 @@ class PazzlePlate extends Phaser.GameObjects.Container {
   constructor(scene, x, y) {
     super(scene, x, y);
     //そろえるパズルの画像９枚
-    this.image1 = scene.add.image(-50, -50, 'a');
-    this.image2 = scene.add.image(0, -50, 'a');
-    this.image3 = scene.add.image(50, -50, 'a');
-    this.image4 = scene.add.image(-50, 0, 'a');
-    this.image5 = scene.add.image(0, 0, 'a');
-    this.image6 = scene.add.image(50, 0, 'a');
-    this.image7 = scene.add.image(-50, 50, 'a');
-    this.image8 = scene.add.image(0, 50, 'a');
-    this.image9 = scene.add.image(50, 50, 'a');
+    this.image1 = scene.add.image(-50, -50, '1');
+    this.image2 = scene.add.image(0, -50, '2');
+    this.image3 = scene.add.image(50, -50, '3');
+    this.image4 = scene.add.image(-50, 0, '4');
+    this.image5 = scene.add.image(0, 0, '5');
+    this.image6 = scene.add.image(50, 0, '6');
+    this.image7 = scene.add.image(-50, 50, '7');
+    this.image8 = scene.add.image(0, 50, '8');
+    this.image9 = scene.add.image(50, 50, '9');
+    //resize
+    this.image1.setScale(0.75);
+    this.image2.setScale(0.75);
+    this.image3.setScale(0.75);
+    this.image4.setScale(0.75);
+    this.image5.setScale(0.75);
+    this.image6.setScale(0.75);
+    this.image7.setScale(0.75);
+    this.image8.setScale(0.75);
+    this.image9.setScale(0.75);
     //コンテナへオブジェクトを追加
     this.add([this.image1, this.image2, this.image3, this.image4, this.image5, this.image6, this.image7, this.image8, this.image9]);
     //全て見えなくする
