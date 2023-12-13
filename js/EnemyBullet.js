@@ -11,7 +11,7 @@ class EnemyBullet extends Phaser.Physics.Arcade.Image {
   fire(x, y) {
     this.setActive(true);
     this.setVisible(true);
-    this.setPosition(x, y);
+    this.setPosition(x, y + 50);
   }
 
   update(time, delta) {

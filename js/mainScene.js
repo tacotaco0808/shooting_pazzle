@@ -9,6 +9,7 @@ class mainScene extends Phaser.Scene {
   player;
   playerStun = false;
   playerHoldPazzle = 0;
+  AllPlayerHoldPazzle = 0;
   /**@type {Phaser.GameObjects.Text} */
   playerHoldPazzleText;
   playerLastFired = 0;
@@ -36,20 +37,33 @@ class mainScene extends Phaser.Scene {
   }
   preload() {
     this.load.image('background', 'assets/Background/bg_layer1.png');
-    this.load.image('player', 'assets/Enemies/flyMan_fly.png');
+    this.load.image('player', 'character/player1_1.png');
+    this.load.image('playerStun', 'character/player1_2.png');
+    this.load.image('playerShot', 'character/player1_shot.png');
     this.load.image('player2', 'assets/Enemies/wingMan1.png');
     this.load.image('player2Stun', 'assets/Enemies/spikeMan_jump.png');
     this.load.image('pazzle', 'assets/Items/carrot.png');
     this.load.image('bullet', 'assets/Enemies/spikeBall1.png');
     this.load.image('pazzleSetter', 'assets/Items/gold_1.png');
+    //表示される分割パズル
+    this.load.image('1', 'pazzle_split/1.png');
+    this.load.image('2', 'pazzle_split/2.png');
+    this.load.image('3', 'pazzle_split/3.png');
+    this.load.image('4', 'pazzle_split/4.png');
+    this.load.image('5', 'pazzle_split/5.png');
+    this.load.image('6', 'pazzle_split/6.png');
+    this.load.image('7', 'pazzle_split/7.png');
+    this.load.image('8', 'pazzle_split/8.png');
+    this.load.image('9', 'pazzle_split/9.png');
+    //キー登録
     this.cursors = this.input.keyboard.createCursorKeys();
     this.keys = this.input.keyboard.addKeys('W,A,S,D,E,SPACE'); //keyboardPluginであるaddkeysメソッドを使ってthis.input.keyboard.Keyを追加
   }
   create() {
     const background = this.add.image(0, 0, 'background');
     //player
-    this.player = this.physics.add.sprite(360, 500, 'player').setScale(0.5);
-    this.player2 = this.physics.add.sprite(360, 0, 'player2').setScale(0.5);
+    this.player = this.physics.add.sprite(360, 500, 'player').setScale(0.7);
+    this.player2 = this.physics.add.sprite(360, 0, 'player2').setScale(0.7);
     //pazzle
     this.pazzles = this.physics.add.group({ classType: Pazzle });
     for (let i = 0; i < this.pazzleNum; i++) {
@@ -73,7 +87,7 @@ class mainScene extends Phaser.Scene {
     this.playerHoldPazzleText = this.add.text(this.sys.canvas.width, this.sys.canvas.height, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(1, 1);
     this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
     //pazzleSetter
-    this.pazzleSetter = new PazzleSetter(this, 360, 250, 'pazzleSetter', this.player);
+    this.pazzleSetter = new PazzleSetter(this, 450, 250, 'pazzleSetter', this.player);
 
     //collision evt
     this.physics.add.overlap(this.player, this.pazzles, this.handleCollisionPazzle, undefined, this);
@@ -131,10 +145,16 @@ class mainScene extends Phaser.Scene {
       });
 
       if (bullet) {
+        //撃つときのモーション
+        this.player.setTexture('playerShot');
+
         //プールの中に利用可能な弾があれば使う
         bullet.fire(this.player.x, this.player.y);
         this.playerLastFired = time + 100; //一つ目の弾発射時+Xms秒後に２つ目発射
       }
+    } else if (this.player.texture.key === 'playerShot' && time > this.playerLastFired) {
+      //撃つモーションから通常モーションへ
+      this.player.setTexture('player');
     }
     this.bullets.children.iterate((bullet) => {
       // colliedPlayer && Phaser.Geom.Intersects.RectangleToRectangle(this.getBounds(), colliedPlayer.getBounds())
@@ -174,7 +194,9 @@ class mainScene extends Phaser.Scene {
       this.playerHoldPazzle++;
       const value = `Pazzle: ${this.playerHoldPazzle}`;
       this.playerHoldPazzleText.text = value;
-      console.log(this.playerHoldPazzle);
+      this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
+      //ピース合計
+      this.AllPlayerHoldPazzle++;
     } else if (this.playerHoldPazzle == 3) {
       this.pazzles.killAndHide(pazzle);
       this.physics.world.disableBody(pazzle.body);
@@ -182,25 +204,50 @@ class mainScene extends Phaser.Scene {
       const value = `Pazzle: ${this.playerHoldPazzle}`;
       this.playerHoldPazzleText.text = value;
       this.playerHoldPazzleText.setStyle({ color: '#FF0000' }); //red
-      console.log(this.playerHoldPazzle);
+      //ピース合計
+      this.AllPlayerHoldPazzle++;
     }
   }
   handleCollisionBullet(player2, bullet) {
-    this.time.delayedCall(2000, this.playerStunFalse, [], this);
+    //相手に弾が当たった時
+    this.time.delayedCall(2000, this.player2StunFalse, [], this);
     this.player2Stun = true;
     this.player2.setTexture('player2Stun');
     this.player2.setVelocity(0);
   }
-  handleCollisionEnemyBullet(player, enemyBullet) {}
+  handleCollisionEnemyBullet(player, enemyBullet) {
+    //自分に弾が当たった時
+    this.time.delayedCall(2000, this.playerStunFalse, [], this);
+    this.playerStun = true;
+    this.player.setTexture('playerStun');
+    this.player.setVelocity(0);
+  }
   playerStunFalse() {
+    this.playerStun = false;
+    this.player.setTexture('player');
+  }
+  player2StunFalse() {
     this.player2Stun = false;
     this.player2.setTexture('player2');
   }
   handleCollisionPazzleSetter(player, pazzleSetter) {
-    this.pazzleSetter.setHoldPazzleNum(this.playerHoldPazzle);
-    this.playerHoldPazzle = 0; //この処理らをpazzleSetterとの衝突判定で書く
-    const value = `Pazzle: ${this.playerHoldPazzle}`;
-    this.playerHoldPazzleText.text = value;
+    if (this.AllPlayerHoldPazzle === 9) {
+      //9つ集めたらクリア
+
+      this.time.delayedCall(
+        3000,
+        () => {
+          this.scene.start('GameClear');
+        },
+        [],
+        this
+      );
+    } else {
+      this.pazzleSetter.setHoldPazzleNum(this.playerHoldPazzle);
+      this.playerHoldPazzle = 0; //この処理らをpazzleSetterとの衝突判定で書く
+      const value = `Pazzle: ${this.playerHoldPazzle}`;
+      this.playerHoldPazzleText.text = value;
+    }
   }
 }
 export default mainScene;

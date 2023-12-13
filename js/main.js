@@ -1,5 +1,6 @@
 import '../style.css';
 import MainScene from './mainScene';
+import GameClear from './GameClear';
 const gameCanvas = document.createElement('canvas');
 const app = document.querySelector('#app');
 gameCanvas.id = 'gameCanvas';
@@ -16,7 +17,7 @@ const config = {
       debug: true,
     },
   },
-  scene: MainScene,
+  scene: [MainScene, GameClear],
 };
 
 const game = new Phaser.Game(config);
