@@ -44,6 +44,7 @@ class mainScene extends Phaser.Scene {
     this.load.image('player2Stun', 'character/player2_2.png');
     this.load.image('pazzle', 'item/item.png');
     this.load.image('bullet', 'character/bullet.png');
+
     this.load.image('pazzleSetter', 'assets/Items/gold_1.png');
     //表示される分割パズル
     this.load.image('1', 'pazzle_split/1.png');
@@ -64,7 +65,9 @@ class mainScene extends Phaser.Scene {
     const background = this.add.image(400, 350, 'background').setScale(0.25);
     //player
     this.player = this.physics.add.sprite(360, 500, 'player').setScale(0.7);
+
     this.player2 = this.physics.add.sprite(360, 0, 'player2').setScale(0.3);
+
     //pazzle
     this.pazzles = this.physics.add.group({ classType: Pazzle });
     for (let i = 0; i < this.pazzleNum; i++) {
@@ -88,6 +91,7 @@ class mainScene extends Phaser.Scene {
     this.playerHoldPazzleText = this.add.text(this.sys.canvas.width, this.sys.canvas.height, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(1, 1);
     this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
     //pazzleSetter
+
     this.pazzleSetter = new PazzleSetter(this, 720, 250, 'pazzleSetter', this.player);
 
     //collision evt
