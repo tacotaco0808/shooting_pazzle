@@ -58,7 +58,6 @@ class PazzlePlate extends Phaser.GameObjects.Container {
     this.image9.setVisible(false);
     //パズルのプレートを表示
     scene.add.existing(this);
-    console.log(this.imageArray);
   }
   shuffleAndSetImage(count) {
     if (this.imageArray.length) {
@@ -67,7 +66,6 @@ class PazzlePlate extends Phaser.GameObjects.Container {
         let indexPazzle = 0; //抽選した番号
         this.shuffleArray(); //抽選
         indexPazzle = this.imageArray.pop();
-        console.log(i + ':' + indexPazzle);
         this.setImage(indexPazzle);
       }
     }

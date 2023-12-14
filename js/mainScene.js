@@ -36,14 +36,14 @@ class mainScene extends Phaser.Scene {
     super('mainGame');
   }
   preload() {
-    this.load.image('background', 'assets/Background/bg_layer1.png');
+    this.load.image('background', 'background/planet.png');
     this.load.image('player', 'character/player1_1.png');
     this.load.image('playerStun', 'character/player1_2.png');
     this.load.image('playerShot', 'character/player1_shot.png');
-    this.load.image('player2', 'assets/Enemies/wingMan1.png');
-    this.load.image('player2Stun', 'assets/Enemies/spikeMan_jump.png');
-    this.load.image('pazzle', 'assets/Items/carrot.png');
-    this.load.image('bullet', 'assets/Enemies/spikeBall1.png');
+    this.load.image('player2', 'character/player2.png');
+    this.load.image('player2Stun', 'character/player2_2.png');
+    this.load.image('pazzle', 'item/item.png');
+    this.load.image('bullet', 'character/bullet.png');
     this.load.image('pazzleSetter', 'assets/Items/gold_1.png');
     //表示される分割パズル
     this.load.image('1', 'pazzle_split/1.png');
@@ -60,18 +60,19 @@ class mainScene extends Phaser.Scene {
     this.keys = this.input.keyboard.addKeys('W,A,S,D,E,SPACE'); //keyboardPluginであるaddkeysメソッドを使ってthis.input.keyboard.Keyを追加
   }
   create() {
-    const background = this.add.image(0, 0, 'background');
+    //background
+    const background = this.add.image(400, 350, 'background').setScale(0.25);
     //player
     this.player = this.physics.add.sprite(360, 500, 'player').setScale(0.7);
-    this.player2 = this.physics.add.sprite(360, 0, 'player2').setScale(0.7);
+    this.player2 = this.physics.add.sprite(360, 0, 'player2').setScale(0.3);
     //pazzle
     this.pazzles = this.physics.add.group({ classType: Pazzle });
     for (let i = 0; i < this.pazzleNum; i++) {
-      const x = Phaser.Math.Between(0, 720); //x:0~400の間にrandomで生成
-      const y = 55 * i; //高さもランダム
+      const x = Phaser.Math.Between(0, 820); //x:0~400の間にrandomで生成
+      const y = Phaser.Math.Between(150, 600); //高さもランダム
       /** @type {Phaser.Physics.Arcade.Sprite} */
       const pazzle = this.pazzles.create(x, y, 'pazzle');
-      pazzle.scale = 0.8;
+      pazzle.scale = 0.5;
       /** @type {Phaser.Physics.Arcade.StaticBody} */
       const body = pazzle.body;
       body.updateFromGameObject();
@@ -87,7 +88,7 @@ class mainScene extends Phaser.Scene {
     this.playerHoldPazzleText = this.add.text(this.sys.canvas.width, this.sys.canvas.height, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(1, 1);
     this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
     //pazzleSetter
-    this.pazzleSetter = new PazzleSetter(this, 450, 250, 'pazzleSetter', this.player);
+    this.pazzleSetter = new PazzleSetter(this, 720, 250, 'pazzleSetter', this.player);
 
     //collision evt
     this.physics.add.overlap(this.player, this.pazzles, this.handleCollisionPazzle, undefined, this);

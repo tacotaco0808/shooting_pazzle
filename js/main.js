@@ -7,8 +7,8 @@ gameCanvas.id = 'gameCanvas';
 app.appendChild(gameCanvas);
 
 const config = {
-  width: 720,
-  height: 500,
+  width: 820,
+  height: 600,
   type: Phaser.WEBGL,
   canvas: gameCanvas,
   physics: {
