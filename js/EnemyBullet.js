@@ -6,7 +6,8 @@ class EnemyBullet extends Phaser.Physics.Arcade.Image {
   constructor(scene) {
     super(scene, 0, 0, 'bullet');
     this.speed = Phaser.Math.GetSpeed(300, 1);
-    this.scale = 0.5;
+    this.scaleY = 2;
+    this.scaleX = 0.2;
   }
   fire(x, y) {
     this.setActive(true);
