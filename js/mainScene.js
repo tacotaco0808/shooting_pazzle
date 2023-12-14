@@ -85,8 +85,11 @@ class mainScene extends Phaser.Scene {
     //countText
     const countText = { color: 'white', fontSize: 24 };
     //setOriginはオブジェクトの中心をきめる
-    this.playerHoldPazzleText = this.add.text(this.sys.canvas.width, this.sys.canvas.height, 'Pazzle: 0', countText).setScrollFactor(0).setOrigin(1, 1);
-    this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
+    this.playerHoldPazzleText = this.add
+      .text(this.sys.canvas.width - 20, 20, 'Pazzle: 0', countText)
+      .setScrollFactor(0)
+      .setOrigin(1, 0);
+    this.playerHoldPazzleText.setStyle({ color: '#64fffa' });
     //pazzleSetter
 
     this.pazzleSetter = new PazzleSetter(this, 720, 250, 'pazzleSetter', this.player);
@@ -194,7 +197,7 @@ class mainScene extends Phaser.Scene {
       this.playerHoldPazzle++;
       const value = `Pazzle: ${this.playerHoldPazzle}`;
       this.playerHoldPazzleText.text = value;
-      this.playerHoldPazzleText.setStyle({ color: '#4169e1' });
+      this.playerHoldPazzleText.setStyle({ color: '#64fffa' });
       //ピース合計
       this.AllPlayerHoldPazzle++;
     } else if (this.playerHoldPazzle == 3) {
